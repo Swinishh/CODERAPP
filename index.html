@@ -215,51 +215,59 @@
             const textInput = document.getElementById('textInput');
             const outputBox = document.getElementById('outputBox');
             const copyMessage = document.getElementById('copyMessage');
-
+    
             const secretKey = "hardToGuessSecret";
-
-            // Encoding Logic
+    
+            // Encoding Logic for Emojis and Symbols
             function encodeMessage(text) {
                 try {
-                    let encoded = text.split('').map((char, index) => {
+                    // Create a TextEncoder to handle multi-byte characters (like emojis)
+                    const encoder = new TextEncoder();
+                    const encodedText = encoder.encode(text); // Convert the text to UTF-8 encoded bytes
+    
+                    // Apply XOR operation for encoding
+                    let encoded = Array.from(encodedText).map((byte, index) => {
                         const keyByte = secretKey.charCodeAt(index % secretKey.length);
-                        return String.fromCharCode(char.charCodeAt(0) ^ keyByte);
-                    }).join('');
-
-                    encoded = encoded.replace(/ /g, "__SPACE__"); // Handle spaces
-                    for (let i = 0; i < 4; i++) {
-                        encoded = btoa(encoded);
-                    }
-                    return encoded;
+                        return byte ^ keyByte; // XOR operation with secret key
+                    });
+    
+                    // Convert the encoded array of bytes back to string
+                    let encodedString = String.fromCharCode(...encoded);
+    
+                    // Encode the result into Base64 (to safely handle all characters)
+                    return btoa(unescape(encodeURIComponent(encodedString))); // UTF-8 to Base64
                 } catch (error) {
                     alert("Error encoding text. Ensure valid characters are used.");
                     console.error(error);
                     return "";
                 }
             }
-
-            // Decoding Logic
+    
+            // Decoding Logic for Emojis and Symbols
             function decodeMessage(encodedText) {
                 try {
-                    let decoded = encodedText;
-                    for (let i = 0; i < 4; i++) {
-                        decoded = atob(decoded);
-                    }
-
-                    decoded = decoded.replace(/__SPACE__/g, ' '); // Handle spaces
-                    decoded = decoded.split('').map((char, index) => {
+                    // Decode the Base64 string back to the original encoded string
+                    let decodedString = decodeURIComponent(escape(atob(encodedText))); // Base64 to UTF-8
+    
+                    // Convert string back into byte array
+                    let decodedBytes = Array.from(decodedString).map((char) => char.charCodeAt(0));
+    
+                    // Apply XOR operation with secret key to decode
+                    let decoded = decodedBytes.map((byte, index) => {
                         const keyByte = secretKey.charCodeAt(index % secretKey.length);
-                        return String.fromCharCode(char.charCodeAt(0) ^ keyByte);
-                    }).join('');
-
-                    return decoded;
+                        return byte ^ keyByte; // XOR operation to reverse encoding
+                    });
+    
+                    // Use TextDecoder to convert bytes back to text (including emojis)
+                    const decoder = new TextDecoder();
+                    return decoder.decode(new Uint8Array(decoded));
                 } catch (error) {
                     alert("Error decoding text. Ensure it is valid encoded text.");
                     console.error(error);
                     return "";
                 }
             }
-
+    
             // Encode Button Event
             document.getElementById('btnEncode').addEventListener('click', () => {
                 const text = textInput.value.trim();
@@ -273,7 +281,7 @@
                     alert("Error encoding the text!");
                 }
             });
-
+    
             // Decode Button Event
             document.getElementById('btnDecode').addEventListener('click', () => {
                 const encodedText = textInput.value.trim();
@@ -288,18 +296,16 @@
                 }
             });
         });
-
-
-        // to copy text
-
+    
+        // To copy text
         document.getElementById('btnDecopy').addEventListener('click', () => {
             const textToCopy = outputBox.value.trim();
-
+    
             if (textToCopy === '') {
                 copyMessage.textContent = "Nothing to copy!";
                 return;
             }
-
+    
             // Copy text to clipboard
             navigator.clipboard.writeText(textToCopy).then(() => {
                 copyMessage.textContent = `Copied: ${textToCopy}`;
@@ -309,8 +315,8 @@
                 copyMessage.style.color = "red";
             });
         });
-
     </script>
+    
 </body>
 
 </html>
