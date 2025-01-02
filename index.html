@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text APP</title>
+   
+</head>
+<style>
+    /* styles.css */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f5; /* Light neutral background */
+}
+
+div {
+    background: #ffffff; /* White background */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* 3D box shadow */
+    text-align: center;
+    width: 350px;
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: #333; /* Neutral text color */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+input[type="text"]:focus {
+    border-color: #007bff; /* Blue border on focus */
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
+    outline: none;
+}
+
+button {
+    padding: 12px;
+    font-size: 1rem;
+    color: white;
+    background: linear-gradient(135deg, #007bff, #0056b3); /* Gradient background */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Initial shadow */
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3); /* Larger shadow on hover */
+}
+
+button:active {
+    transform: translateY(2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Reduced shadow on click */
+}
+
+button:focus {
+    outline: none;
+}
+
+</style>
+
+<body>
+    <div>
+        <h1>Encode || Decode</h1>
+        <form>
+            <input type="text" id="textInput" placeholder="Enter text">
+            <button id="btnEncode" type="button">Encode</button>
+            <button id="btnDecode" type="button">Decode</button>
+            <input type="text" id="outputBox" placeholder="Result" readonly>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const textInput = document.getElementById('textInput');
+            const outputBox = document.getElementById('outputBox');
+
+            // Encoding Logic
+            function encodeMessage(text) {
+                const encoded = text
+                    .toLowerCase()
+                    .split('') // Split text into individual characters
+                    .map(char => {
+                        if (char >= 'a' && char <= 'z') {
+                            // Map 'a' to -26, 'b' to -25, ..., 'z' to 0
+                            return char.charCodeAt(0) - 'a'.charCodeAt(0) - 26;
+                        }
+                        return char; // Keep non-alphabetic characters as is
+                    })
+                    .join(' '); // Join the characters back into a string with spaces
+                return encoded;
+            }
+
+            // Decoding Logic
+            function decodeMessage(encodedText) {
+                const decoded = encodedText
+                    .split(' ') // Split the encoded text into components
+                    .map(code => {
+                        if (!isNaN(code)) {
+                            const num = parseInt(code, 10) + 26; // Convert back to 0-25 range
+                            return String.fromCharCode(num + 'a'.charCodeAt(0)); // Get letter
+                        }
+                        return code; // Keep non-alphabetic characters as is
+                    })
+                    .join(''); // Join back into a single string
+                return decoded;
+            }
+
+            // Encode Button Event
+            document.getElementById('btnEncode').addEventListener('click', () => {
+                const text = textInput.value.trim();
+                if (text === '') {
+                    alert('Please enter text to encode.');
+                    return;
+                }
+                outputBox.value = encodeMessage(text);
+            });
+
+            // Decode Button Event
+            document.getElementById('btnDecode').addEventListener('click', () => {
+                const encodedText = textInput.value.trim();
+                if (encodedText === '') {
+                    alert('Please enter text to decode.');
+                    return;
+                }
+                outputBox.value = decodeMessage(encodedText);
+            });
+        });
+    </script>
+</body>
+
+</html>
