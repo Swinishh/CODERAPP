@@ -31,6 +31,7 @@
             border-radius: 1%;
             box-shadow: 17px 27px 8px rgb(45, 45, 45);
             text-align: center;
+            overflow: hidden;
 
         }
 
@@ -126,7 +127,10 @@
 
         #copymessage {
 
-            font-size: .8rem;
+            font-size: 1rem;
+            max-width: 50ch;
+                padding-right: 1rem;
+                overflow-x: scroll;
         }
 
 
@@ -181,6 +185,14 @@
                 font-size: 0.8rem;
                 /* Adjust copy message font size */
             }
+
+
+            #copyMessage {
+                max-width: 30ch;
+                padding-right: 3rem;
+                overflow: scroll;
+            }
+
         }
     </style>
 </head>
